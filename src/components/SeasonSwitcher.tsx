@@ -54,7 +54,7 @@ const SeasonSwitcher: React.FC<SeasonSwitcherProps> = ({ currentSeason, onChange
       }
   };
 
-  const handleDragEnd = (e: React.TouchEvent | React.MouseEvent) => {
+  const handleDragEnd = () => {
       if (!isDragging || variant !== 'docked') return;
       setIsDragging(false);
       

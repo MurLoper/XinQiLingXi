@@ -144,7 +144,7 @@ const ChatWidget: React.FC = () => {
     window.addEventListener('mouseup', onUp);
   };
 
-  const handleIconClick = (e: React.MouseEvent) => {
+  const handleIconClick = () => {
     if (!dragRef.current.hasMoved) {
       setIsOpen(!isOpen);
     }
