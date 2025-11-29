@@ -3,7 +3,6 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { WatermarkConfig } from '../../types';
 import { IconArrowRight, IconFeather, IconCheck } from '../Icons';
 
-// Default Configuration
 const DEFAULT_CONFIG: WatermarkConfig = {
   type: 'text',
   text: '心栖灵犀 @XinQiLingXi',
@@ -23,7 +22,6 @@ declare global {
   }
 }
 
-// 扩展配置以支持平铺模式
 interface ExtendedConfig extends WatermarkConfig {
     mode: 'tiled' | 'single';
 }
@@ -39,7 +37,6 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // 1. Dynamic Import of gif.js
   useEffect(() => {
     if (window.GIF) {
       setLibLoaded(true);
@@ -51,7 +48,6 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     document.body.appendChild(script);
   }, []);
 
-  // Handle Main Image Upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
@@ -61,7 +57,6 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     }
   };
 
-  // Handle Watermark Image Upload (Template)
   const handleWatermarkImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const reader = new FileReader();
@@ -77,7 +72,6 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     }
   };
 
-  // Draw Function
   const drawWatermark = useCallback(() => {
     if (!canvasRef.current || !previewUrl) return;
     
@@ -90,14 +84,11 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     mainImg.src = previewUrl;
 
     mainImg.onload = () => {
-      // 1. Setup Canvas Size
       canvas.width = mainImg.width;
       canvas.height = mainImg.height;
 
-      // 2. Draw Original Image
       ctx.drawImage(mainImg, 0, 0);
 
-      // 3. Prepare Watermark Pattern (Offscreen Canvas)
       const markCanvas = document.createElement('canvas');
       const markCtx = markCanvas.getContext('2d');
       if (!markCtx) return;
@@ -113,13 +104,11 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         const textW = Math.ceil(metrics.width);
         const textH = Math.ceil(textSize * 1.2);
 
-        // Calculate size needed to hold rotated text
         const sin = Math.abs(Math.sin(radians));
         const cos = Math.abs(Math.cos(radians));
         markWidth = textW * cos + textH * sin;
         markHeight = textW * sin + textH * cos;
 
-        // Add padding/gap for tiling
         const tileSize = Math.max(markWidth, markHeight) + (mode === 'tiled' ? gap : 0);
         
         markCanvas.width = tileSize;
@@ -155,7 +144,6 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           return;
       }
 
-      // 4. Draw to Main Canvas
       if (mode === 'tiled') {
          const pattern = ctx.createPattern(markCanvas, 'repeat');
          if (pattern) {
@@ -163,7 +151,6 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             ctx.fillRect(0, 0, canvas.width, canvas.height);
          }
       } else {
-         // Single mode: Center
          const centerX = canvas.width / 2;
          const centerY = canvas.height / 2;
          ctx.drawImage(markCanvas, centerX - markCanvas.width/2, centerY - markCanvas.height/2);
@@ -171,7 +158,6 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     };
   }, [previewUrl, config, watermarkImage]);
 
-  // Effect to Redraw
   useEffect(() => {
     const timer = setTimeout(() => {
         drawWatermark();
@@ -179,29 +165,25 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     return () => clearTimeout(timer);
   }, [drawWatermark]);
 
-  // Handle Export with Web Worker Blob Trick for GIF
   const handleDownload = async () => {
     if (!canvasRef.current || !file) return;
     setIsProcessing(true);
 
     try {
         if (file.type === 'image/gif' && window.GIF) {
-            // 1. Fetch Worker Code as Text
             const workerScriptUrl = 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js';
             const response = await fetch(workerScriptUrl);
             const workerCode = await response.text();
             
-            // 2. Create Blob URL for Worker (Bypasses CORS restriction for Workers)
             const blob = new Blob([workerCode], { type: 'application/javascript' });
             const workerBlobUrl = URL.createObjectURL(blob);
 
             const gif = new window.GIF({
                 workers: 2,
                 quality: 10,
-                workerScript: workerBlobUrl // Use local blob URL
+                workerScript: workerBlobUrl 
             });
 
-            // Note: Currently rendering single frame. Full GIF support requires parsing frames.
             gif.addFrame(canvasRef.current, {copy: true});
             
             gif.on('finished', (blob: Blob) => {
@@ -210,12 +192,11 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 link.download = `watermarked_${file.name}`;
                 link.click();
                 setIsProcessing(false);
-                URL.revokeObjectURL(workerBlobUrl); // Clean up
+                URL.revokeObjectURL(workerBlobUrl); 
             });
 
             gif.render();
         } else {
-            // Static Image
             const dataUrl = canvasRef.current.toDataURL(file.type, 0.9);
             const link = document.createElement('a');
             link.href = dataUrl;
@@ -232,7 +213,6 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   return (
     <div className="flex flex-col h-screen bg-[#f3f2ed] animate-fade-in fixed inset-0 z-50">
-      {/* Tool Header */}
       <div className="h-14 md:h-16 bg-white/80 backdrop-blur-md border-b border-stone-200 flex items-center px-4 md:px-6 justify-between flex-shrink-0 z-20">
         <div className="flex items-center">
             <button onClick={onBack} className="mr-2 md:mr-4 p-2 hover:bg-stone-100 rounded-full transition-colors text-gray-600">
@@ -266,10 +246,7 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       </div>
 
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden relative">
-        {/* Settings Sidebar - Bottom on Mobile, Left on Desktop */}
         <div className="w-full md:w-80 bg-white border-t md:border-t-0 md:border-r border-stone-200 p-4 md:p-6 overflow-y-auto flex-shrink-0 z-10 shadow-sm order-2 md:order-1 h-[45vh] md:h-auto">
-            
-            {/* Mode Toggle */}
             <div className="bg-stone-100 p-1 rounded-lg flex mb-6">
                 <button 
                     onClick={() => setConfig(c => ({...c, mode: 'tiled'}))}
@@ -285,7 +262,6 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 </button>
             </div>
 
-            {/* Type Toggle */}
             <div className="flex gap-4 mb-6 text-sm font-medium text-gray-600 border-b border-stone-100 pb-2">
                 <button 
                     onClick={() => setConfig(c => ({...c, type: 'text'}))}
@@ -406,7 +382,6 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </div>
         </div>
 
-        {/* Canvas Workspace - Top on Mobile, Right on Desktop */}
         <div className="flex-1 bg-stone-100 overflow-auto flex items-center justify-center p-4 md:p-8 relative order-1 md:order-2" ref={containerRef}>
             {!file ? (
                 <div className="text-center text-gray-400">

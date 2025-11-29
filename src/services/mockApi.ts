@@ -1,15 +1,13 @@
-import { MOCK_PROJECTS } from '../constants';
+
+import { MOCK_PROJECTS } from '../config/constants';
 import { Project, ApiResponse } from '../types';
 
 // Simulate network delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const apiService = {
-  /**
-   * Fetch all projects
-   */
   getProjects: async (): Promise<ApiResponse<Project[]>> => {
-    await delay(800); // Simulate 800ms loading time
+    await delay(800); 
     return {
       success: true,
       data: MOCK_PROJECTS,
@@ -17,9 +15,6 @@ export const apiService = {
     };
   },
 
-  /**
-   * Fetch a single project by ID
-   */
   getProjectById: async (id: string): Promise<ApiResponse<Project | null>> => {
     await delay(500);
     const project = MOCK_PROJECTS.find(p => p.id === id) || null;

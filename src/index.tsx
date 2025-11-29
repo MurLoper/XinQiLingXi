@@ -2,7 +2,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import './index.css'; // Import global styles
+import './styles/global.css';
+
+console.log('✨ 心栖灵犀 App Starting...');
 
 class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
   constructor(props: any) {
@@ -43,6 +45,7 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
+  console.error("Fatal Error: Could not find root element to mount to");
   throw new Error("Could not find root element to mount to");
 }
 

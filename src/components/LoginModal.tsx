@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { authService } from '../services/authService';
 import { IconFeather } from './Icons';
@@ -39,13 +40,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       ></div>
 
-      {/* Modal Content */}
       <div className="relative w-full max-w-md bg-[#f3f2ed] rounded-2xl shadow-2xl overflow-hidden border border-white/50 animate-fade-in-up">
         <div className="absolute top-0 left-0 w-full h-1 bg-zen-green"></div>
         

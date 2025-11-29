@@ -1,0 +1,35 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Critical CSS Fallback */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-serif {
+  font-family: 'Noto Serif SC', serif;
+}
+
+div {
+    transition: color 1s cubic-bezier(0.4, 0, 0.2, 1), 
+                background-color 1s cubic-bezier(0.4, 0, 0.2, 1), 
+                border-color 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+img {
+    transition: opacity 1s ease-in-out, transform 0.7s ease-out, filter 0.5s;
+}
+
+:root {
+    --zen-base: #f9f8f4;
+    --zen-stone: #e8e6e1;
+    --zen-text: #5c4e3e;
+    --zen-primary: #657a6e;
+    --zen-secondary: #9cb0a6;
+    --zen-accent: #dba872;
+    --zen-bg: #fbfaf8;
+    --zen-shadow-rgb: 92, 78, 62;
+}

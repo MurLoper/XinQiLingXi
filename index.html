@@ -1,48 +1,35 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>心栖灵犀 - XinQiLingXi</title>
-    <meta name="description" content="寻找心灵栖息之处，运用AI如同灵犀版的智能" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-      /* 基础重置样式，防止 CSS 加载失败时页面完全错乱 */
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: 'Noto Sans SC', sans-serif;
-        background-color: #f3f2ed;
-        color: #4a4a4a;
-      }
-      /* Custom scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #ccc; 
-        border-radius: 4px;
-      }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>心栖灵犀 | 寻找心灵栖息之处</title>
+    <meta name="description" content="心栖灵犀 - 个人数字花园。在这里寻找心灵栖息之处，体验AI赋予的灵犀智能，探索心晴日记、小工具集等温情项目。" />
+    <meta name="keywords" content="React, AI, 心灵栖息, 个人网站, 前端开发, 心晴日记" />
+    <meta name="theme-color" content="#f9f7f2" />
     
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles will be injected by Vite -->
   <script type="importmap">
 {
   "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0"
+    "vite": "https://aistudiocdn.com/vite@^7.2.4",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
+    "path": "https://aistudiocdn.com/path@^0.12.7",
+    "url": "https://aistudiocdn.com/url@^0.11.4"
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
   <body>
     <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
+    <script type="module" src="./src/index.tsx"></script>
+  </body>
 </html>

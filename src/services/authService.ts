@@ -1,12 +1,11 @@
+
 import { ApiResponse } from '../types';
 
-// 模拟管理员凭证 (实际项目中应在后端验证)
 const MOCK_ADMIN_USER = 'admin';
 const MOCK_ADMIN_PASS = 'lingxi2024'; 
 
 export const authService = {
   login: async (username: string, password: string): Promise<ApiResponse<{ token: string }>> => {
-    // 模拟网络延迟
     await new Promise(resolve => setTimeout(resolve, 600));
 
     if (username === MOCK_ADMIN_USER && password === MOCK_ADMIN_PASS) {

@@ -1,5 +1,5 @@
 
-import { Project, ProjectCategory, ProjectStatus } from './types';
+import { Project, ProjectCategory, ProjectStatus } from '../types';
 
 // Mock Data representing the database
 export const MOCK_PROJECTS: Project[] = [
@@ -33,7 +33,6 @@ export const MOCK_PROJECTS: Project[] = [
     tags: ['React', 'Canvas', 'Privacy First'],
     coverImage: 'https://picsum.photos/800/601?blur=2',
     links: [
-      // Changed to internalRoute type
       { label: '立即使用', url: '#', type: 'internal', internalRoute: 'tool-watermark' }
     ],
     features: [
