@@ -88,10 +88,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
             <button 
               type="submit"
               disabled={loading}
-              className={`w-full py-3 rounded-lg text-white font-medium shadow-lg transition-all ${
+              className={`w-full py-3 rounded-lg text-white font-medium shadow-lg transition-all active:scale-95 ${
                 loading 
                   ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-zen-green hover:bg-zen-green/90 hover:scale-[1.02]'
+                  : 'bg-zen-green hover:bg-zen-green/90 md:hover:scale-[1.02]'
               }`}
             >
               {loading ? '验证中...' : '进入空间'}
@@ -100,7 +100,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
         </div>
         
         <div className="bg-stone-100 p-4 text-center">
-          <button onClick={onClose} className="text-xs text-gray-500 hover:text-zen-brown">
+          <button onClick={onClose} className="text-xs text-gray-500 hover:text-zen-brown active:text-zen-brown">
             返回访客模式
           </button>
         </div>

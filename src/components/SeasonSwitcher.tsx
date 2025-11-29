@@ -26,10 +26,10 @@ const SeasonSwitcher: React.FC<SeasonSwitcherProps> = ({ currentSeason, onChange
         <button
           key={s.id}
           onClick={() => onChange(s.id)}
-          className={`group relative px-4 py-1.5 rounded-full transition-all duration-500 overflow-hidden flex flex-col items-center justify-center min-w-[70px] ${
+          className={`group relative px-4 py-1.5 rounded-full transition-all duration-500 overflow-hidden flex flex-col items-center justify-center min-w-[70px] active:scale-95 ${
             currentSeason === s.id 
               ? 'text-white shadow-md' 
-              : 'text-gray-500 hover:bg-stone-100'
+              : 'text-gray-500 md:hover:bg-stone-100 active:bg-stone-200'
           }`}
         >
           {currentSeason === s.id && (

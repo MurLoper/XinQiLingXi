@@ -212,10 +212,10 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#f3f2ed] animate-fade-in fixed inset-0 z-50">
+    <div className="flex flex-col h-[100dvh] bg-[#f3f2ed] animate-fade-in fixed inset-0 z-50">
       <div className="h-14 md:h-16 bg-white/80 backdrop-blur-md border-b border-stone-200 flex items-center px-4 md:px-6 justify-between flex-shrink-0 z-20">
         <div className="flex items-center">
-            <button onClick={onBack} className="mr-2 md:mr-4 p-2 hover:bg-stone-100 rounded-full transition-colors text-gray-600">
+            <button onClick={onBack} className="mr-2 md:mr-4 p-2 md:hover:bg-stone-100 active:bg-stone-200 rounded-full transition-colors text-gray-600">
                 <IconArrowRight className="w-5 h-5 transform rotate-180" />
             </button>
             <h1 className="text-lg md:text-xl font-serif font-bold text-zen-brown flex items-center gap-2">
@@ -225,7 +225,7 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </h1>
         </div>
         <div className="flex gap-2 md:gap-3">
-             <label className="cursor-pointer px-3 py-1.5 md:px-4 md:py-2 bg-stone-100 text-stone-600 rounded-lg hover:bg-stone-200 transition-colors text-xs md:text-sm font-medium flex items-center">
+             <label className="cursor-pointer px-3 py-1.5 md:px-4 md:py-2 bg-stone-100 text-stone-600 rounded-lg md:hover:bg-stone-200 active:bg-stone-300 transition-colors text-xs md:text-sm font-medium flex items-center">
                 <span className="hidden sm:inline">上传图片/GIF</span>
                 <span className="sm:hidden">上传</span>
                 <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
@@ -233,7 +233,7 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
              <button 
                 onClick={handleDownload}
                 disabled={!file || isProcessing || (!libLoaded && file?.type === 'image/gif')}
-                className={`px-4 py-1.5 md:px-6 md:py-2 bg-zen-green text-white rounded-lg shadow-lg hover:bg-zen-green/90 transition-all text-xs md:text-sm font-medium ${(!file || isProcessing) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`px-4 py-1.5 md:px-6 md:py-2 bg-zen-green text-white rounded-lg shadow-lg md:hover:bg-zen-green/90 active:bg-zen-green/80 transition-all text-xs md:text-sm font-medium ${(!file || isProcessing) ? 'opacity-50 cursor-not-allowed' : ''}`}
              >
                 {isProcessing ? '处理中...' : (
                     <>
@@ -250,13 +250,13 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             <div className="bg-stone-100 p-1 rounded-lg flex mb-6">
                 <button 
                     onClick={() => setConfig(c => ({...c, mode: 'tiled'}))}
-                    className={`flex-1 py-1.5 text-sm rounded-md transition-all ${config.mode === 'tiled' ? 'bg-white shadow-sm text-zen-green font-medium' : 'text-gray-500'}`}
+                    className={`flex-1 py-1.5 text-sm rounded-md transition-all active:scale-[0.98] ${config.mode === 'tiled' ? 'bg-white shadow-sm text-zen-green font-medium' : 'text-gray-500'}`}
                 >
                     全图平铺
                 </button>
                 <button 
                     onClick={() => setConfig(c => ({...c, mode: 'single'}))}
-                    className={`flex-1 py-1.5 text-sm rounded-md transition-all ${config.mode === 'single' ? 'bg-white shadow-sm text-zen-green font-medium' : 'text-gray-500'}`}
+                    className={`flex-1 py-1.5 text-sm rounded-md transition-all active:scale-[0.98] ${config.mode === 'single' ? 'bg-white shadow-sm text-zen-green font-medium' : 'text-gray-500'}`}
                 >
                     居中单个
                 </button>
@@ -265,13 +265,13 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             <div className="flex gap-4 mb-6 text-sm font-medium text-gray-600 border-b border-stone-100 pb-2">
                 <button 
                     onClick={() => setConfig(c => ({...c, type: 'text'}))}
-                    className={`pb-2 px-1 ${config.type === 'text' ? 'text-zen-brown border-b-2 border-zen-green' : 'text-gray-400'}`}
+                    className={`pb-2 px-1 active:opacity-70 ${config.type === 'text' ? 'text-zen-brown border-b-2 border-zen-green' : 'text-gray-400'}`}
                 >
                     文字模式
                 </button>
                 <button 
                     onClick={() => setConfig(c => ({...c, type: 'image'}))}
-                    className={`pb-2 px-1 ${config.type === 'image' ? 'text-zen-brown border-b-2 border-zen-green' : 'text-gray-400'}`}
+                    className={`pb-2 px-1 active:opacity-70 ${config.type === 'image' ? 'text-zen-brown border-b-2 border-zen-green' : 'text-gray-400'}`}
                 >
                     图片模式
                 </button>
@@ -316,7 +316,7 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 ) : (
                     <div>
                         <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">上传水印素材</label>
-                        <div className="border-2 border-dashed border-stone-300 rounded-lg p-4 text-center hover:bg-stone-50 transition-colors cursor-pointer relative group">
+                        <div className="border-2 border-dashed border-stone-300 rounded-lg p-4 text-center md:hover:bg-stone-50 active:bg-stone-50 transition-colors cursor-pointer relative group">
                              <input type="file" className="absolute inset-0 opacity-0 cursor-pointer z-10" accept="image/*" onChange={handleWatermarkImageUpload} />
                              {watermarkImage ? (
                                 <img src={watermarkImage.src} alt="Watermark" className="h-20 mx-auto object-contain" />

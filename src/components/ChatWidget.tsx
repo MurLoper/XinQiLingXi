@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { aiService } from '../services/aiService';
 import { IconFeather, IconArrowRight } from './Icons';
@@ -44,11 +45,11 @@ const ChatWidget: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 font-sans">
+    <div className="fixed bottom-6 right-6 z-50 font-sans pointer-events-none">
       {/* 聊天窗口 */}
       <div 
         className={`bg-white/90 backdrop-blur-xl border border-white/60 shadow-glass rounded-2xl w-[85vw] max-w-[360px] h-[500px] flex flex-col mb-4 overflow-hidden transition-all duration-300 origin-bottom-right ${
-          isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 translate-y-4 pointer-events-none'
+          isOpen ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto' : 'opacity-0 scale-90 translate-y-4 pointer-events-none'
         }`}
       >
         {/* Header */}
@@ -64,7 +65,7 @@ const ChatWidget: React.FC = () => {
           </div>
           <button 
             onClick={() => setIsOpen(false)} 
-            className="text-white/70 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10"
+            className="text-white/70 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-full active:bg-white/10"
           >
             ×
           </button>
@@ -111,7 +112,7 @@ const ChatWidget: React.FC = () => {
             onClick={handleSend} 
             disabled={!input.trim() || loading}
             className={`w-9 h-9 flex items-center justify-center rounded-full text-white shadow-md transition-all ${
-              !input.trim() || loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-zen-primary hover:bg-zen-primary/90 hover:scale-105'
+              !input.trim() || loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-zen-primary md:hover:bg-zen-primary/90 md:hover:scale-105 active:scale-95'
             }`}
           >
             <IconArrowRight className="w-4 h-4" />
@@ -122,7 +123,7 @@ const ChatWidget: React.FC = () => {
       {/* 悬浮按钮 */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`group relative w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-500 hover:scale-110 ${
+        className={`group relative w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-500 md:hover:scale-110 active:scale-95 pointer-events-auto ${
             isOpen ? 'bg-stone-200 text-stone-500 rotate-90' : 'bg-gradient-to-br from-zen-primary to-zen-secondary text-white'
         }`}
       >

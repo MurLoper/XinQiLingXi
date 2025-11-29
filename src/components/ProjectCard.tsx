@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Project, ProjectStatus } from '../types';
 import { IconArrowRight, IconCheck } from './Icons';
@@ -21,15 +20,42 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onNavigate }) => {
   };
 
   const handleLinkClick = (e: React.MouseEvent, link: any) => {
+    // 阻止冒Pb，避免触发外层的卡片点击事件
+    e.stopPropagation();
     if (link.type === 'internal' && link.internalRoute && onNavigate) {
         e.preventDefault();
         onNavigate(link.internalRoute);
     }
   };
 
+  const handleCardClick = () => {
+    // 如果用户正在选择文本，不触发跳转
+    if (window.getSelection()?.toString().length) return;
+
+    // 寻找主链接：优先内部路由，其次是演示链接，最后是第一个链接
+    const primaryLink = project.links.find(l => l.type === 'internal') || 
+                        project.links.find(l => l.type === 'demo') ||
+                        project.links[0];
+    
+    if (primaryLink) {
+         if (primaryLink.type === 'internal' && primaryLink.internalRoute && onNavigate) {
+            onNavigate(primaryLink.internalRoute);
+        } else if (primaryLink.url && primaryLink.url !== '#') {
+            window.location.href = primaryLink.url;
+        }
+    }
+  };
+
+  const hasLinks = project.links.length > 0;
+
   return (
     <div 
-      className={`group relative flex flex-col h-full rounded-[1.5rem] overflow-hidden transition-all duration-500 hover:-translate-y-2 border border-white/40 shadow-soft hover:shadow-glass hover:border-zen-primary/30`}
+      onClick={hasLinks ? handleCardClick : undefined}
+      className={`group relative flex flex-col h-full rounded-[1.5rem] overflow-hidden transition-all duration-500 border border-white/40 shadow-soft hover:shadow-glass hover:border-zen-primary/30
+      ${/* 核心修复：仅在桌面端(md)启用悬浮上移，移动端使用按下缩放效果，避免 Hover 导致的双击问题 */ ''}
+      md:hover:-translate-y-2
+      ${hasLinks ? 'cursor-pointer active:scale-[0.98] md:active:scale-100' : ''}
+      `}
       style={{ backgroundColor: 'var(--zen-bg)', backdropFilter: 'blur(12px)' }}
     >
       <div className="h-52 overflow-hidden relative flex-shrink-0">
@@ -64,8 +90,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onNavigate }) => {
             </div>
             
             <button 
-                onClick={(e) => { e.preventDefault(); setIsExpanded(!isExpanded); }}
-                className="mt-1 text-xs font-bold text-zen-primary hover:text-zen-accent transition-colors focus:outline-none flex items-center"
+                onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
+                className="mt-1 text-xs font-bold text-zen-primary hover:text-zen-accent transition-colors focus:outline-none flex items-center p-2 -ml-2"
             >
                 {isExpanded ? '收起介绍' : '展开更多'}
                 <IconArrowRight className={`w-3 h-3 ml-1 transform transition-transform duration-300 ${isExpanded ? '-rotate-90' : 'rotate-90'}`} />
@@ -104,7 +130,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onNavigate }) => {
                  key={idx} 
                  href={link.url}
                  onClick={(e) => handleLinkClick(e, link)}
-                 className="group/link text-sm font-bold text-zen-primary hover:text-zen-accent transition-colors flex items-center cursor-pointer"
+                 className="group/link text-sm font-bold text-zen-primary hover:text-zen-accent transition-colors flex items-center cursor-pointer p-2 -m-2"
                >
                  <span className="relative">
                     {link.label}
