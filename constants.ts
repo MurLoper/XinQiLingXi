@@ -1,3 +1,4 @@
+
 import { Project, ProjectCategory, ProjectStatus } from './types';
 
 // Mock Data representing the database
@@ -29,14 +30,15 @@ export const MOCK_PROJECTS: Project[] = [
     description: '集成多种纯前端处理的小工具，注重隐私保护，数据不上传服务器。包括图片加水印、格式转换、JSON格式化等实用功能。',
     category: ProjectCategory.Tool,
     status: ProjectStatus.Live,
-    tags: ['React', 'WASM', 'Privacy First'],
+    tags: ['React', 'Canvas', 'Privacy First'],
     coverImage: 'https://picsum.photos/800/601?blur=2',
     links: [
-      { label: '立即使用', url: '#tools', type: 'demo' }
+      // Changed to internalRoute type
+      { label: '立即使用', url: '#', type: 'internal', internalRoute: 'tool-watermark' }
     ],
     features: [
       { name: '图片水印', description: '本地处理，保护您的创作版权' },
-      { name: '数据转换', description: '开发者常用的编码转换工具' }
+      { name: 'GIF支持', description: '支持动图水印合成' }
     ]
   },
   {

@@ -1,0 +1,19 @@
+
+/* 
+  Standard Tailwind Directives.
+  In a real production build (1panel + OpenResty), these will be compiled by PostCSS.
+  In this Dev/Preview environment, DevTailwindLoader.tsx handles the processing.
+*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Critical CSS Fallback */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-serif {
+  font-family: 'Noto Serif SC', serif;
+}

@@ -1,3 +1,4 @@
+
 export enum ProjectStatus {
   Live = '已上线',
   Development = '开发中',
@@ -16,7 +17,8 @@ export enum ProjectCategory {
 export interface ProjectLink {
   label: string;
   url: string;
-  type: 'demo' | 'github' | 'docs';
+  type: 'demo' | 'github' | 'docs' | 'internal'; // Added internal for client-side routing
+  internalRoute?: string; // Route ID
 }
 
 export interface Feature {
@@ -42,4 +44,19 @@ export interface ApiResponse<T> {
   data: T;
   success: boolean;
   message?: string;
+}
+
+// Watermark Specific Types
+export interface WatermarkConfig {
+  type: 'text' | 'image';
+  text: string;
+  textColor: string;
+  textSize: number;
+  opacity: number;
+  rotate: number;
+  gap: number; // Density/Spacing
+  xOffset: number;
+  yOffset: number;
+  imageSrc?: string; // For image watermark
+  imageScale: number;
 }

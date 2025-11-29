@@ -1,42 +1,25 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>心栖灵犀 - XinQiLingXi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'zen-stone': '#e6e5e0',
-              'zen-brown': '#5c554b',
-              'zen-green': '#4a5d4e',
-              'zen-accent': '#d4a373',
-              'zen-bg': '#f3f2ed',
-            },
-            fontFamily: {
-              sans: ['"Noto Sans SC"', 'sans-serif'],
-              serif: ['"Noto Serif SC"', 'serif'],
-            }
-          }
-        }
-      }
-    </script>
+    <meta name="description" content="寻找心灵栖息之处，运用AI如同灵犀版的智能" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
+      /* 基础重置样式，防止 CSS 加载失败时页面完全错乱 */
       body {
+        margin: 0;
+        padding: 0;
         font-family: 'Noto Sans SC', sans-serif;
         background-color: #f3f2ed;
-        scroll-behavior: smooth;
+        color: #4a4a4a;
       }
-      .font-serif {
-        font-family: 'Noto Serif SC', serif;
-      }
-      /* Custom scrollbar for webkit */
+      /* Custom scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
+        height: 8px;
       }
       ::-webkit-scrollbar-track {
         background: #f1f1f1; 
@@ -45,10 +28,8 @@
         background: #ccc; 
         border-radius: 4px;
       }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #aaa; 
-      }
     </style>
+    
   <script type="importmap">
 {
   "imports": {

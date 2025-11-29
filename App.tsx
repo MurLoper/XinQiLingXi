@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, Suspense } from 'react';
 import { Project, ApiResponse, ProjectCategory } from './types';
 import { apiService } from './services/mockApi';
 import { authService } from './services/authService';
 import ProjectCard from './components/ProjectCard';
 import LoginModal from './components/LoginModal';
+import DevTailwindLoader from './components/DevTailwindLoader'; // Import the loader
 import { SITE_CONFIG } from './constants';
 import { IconFeather, IconHeart, IconCpu, IconSun } from './components/Icons';
+
+// Lazy Load Tools to improve initial render performance
+const WatermarkTool = React.lazy(() => import('./components/tools/WatermarkTool'));
 
 function App() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'app' | 'tool'>('all');
+  const [currentView, setCurrentView] = useState<'home' | 'tool-watermark'>('home');
   
   // Admin State
   const [isAdmin, setIsAdmin] = useState(false);
@@ -21,7 +27,7 @@ function App() {
     const hasSession = authService.checkSession();
     setIsAdmin(hasSession);
 
-    // 2. Check URL parameters for admin entry (e.g. ?admin=true or ?mode=admin)
+    // 2. Check URL parameters
     const params = new URLSearchParams(window.location.search);
     if (!hasSession && (params.get('admin') === 'true' || params.get('mode') === 'admin')) {
       setShowLoginModal(true);
@@ -46,7 +52,6 @@ function App() {
 
   const handleLoginSuccess = () => {
     setIsAdmin(true);
-    // Remove the query param from URL without refreshing to keep it clean
     const url = new URL(window.location.href);
     url.searchParams.delete('admin');
     url.searchParams.delete('mode');
@@ -56,25 +61,51 @@ function App() {
   const handleLogout = () => {
     authService.logout();
     setIsAdmin(false);
-    setActiveTab('all'); // Reset tab incase they were on a hidden one
+    setActiveTab('all');
+  };
+
+  // Internal Navigation Handler
+  const handleNavigate = (route: string) => {
+    if (route === 'tool-watermark') {
+        setCurrentView('tool-watermark');
+        window.scrollTo(0, 0);
+    }
   };
 
   // Filter Logic
   const filteredProjects = projects.filter(p => {
-    // Security Rule: If not admin, hide Backend/Admin projects completely
     if (!isAdmin && p.category === ProjectCategory.Backend) return false;
-
-    // Tab Filters
     if (activeTab === 'all') return true;
     if (activeTab === 'app') return p.category === ProjectCategory.App || p.category === ProjectCategory.Web;
-    // 'tool' tab includes Tools, AI, and Backend (if admin)
     if (activeTab === 'tool') return p.category === ProjectCategory.Tool || p.category === ProjectCategory.AI || p.category === ProjectCategory.Backend;
     return true;
   });
 
+  // Render Tool View if active
+  if (currentView === 'tool-watermark') {
+      return (
+          <>
+            <DevTailwindLoader />
+            <Suspense fallback={
+                <div className="flex items-center justify-center min-h-screen bg-[#f3f2ed]">
+                    <div className="flex flex-col items-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-zen-green mb-4"></div>
+                        <p className="text-gray-500 font-serif">正在准备工具...</p>
+                    </div>
+                </div>
+            }>
+                <WatermarkTool onBack={() => setCurrentView('home')} />
+            </Suspense>
+          </>
+      );
+  }
+
+  // Main Landing Page
   return (
     <div className="min-h-screen text-gray-800 relative selection:bg-zen-accent selection:text-white">
-      
+      {/* Inject Style Loader for Dev Environment */}
+      <DevTailwindLoader />
+
       {/* Login Modal */}
       <LoginModal 
         isOpen={showLoginModal} 
@@ -82,21 +113,17 @@ function App() {
         onLoginSuccess={handleLoginSuccess}
       />
 
-      {/* Background Ambience - Fixed */}
-      <div className="fixed inset-0 z-0">
-         {/* Base warm background */}
+      {/* Background Ambience */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
          <div className="absolute inset-0 bg-[#f3f2ed]"></div>
-         {/* Nature Overlay Image (Stream/Forest vibe) */}
          <img 
             src="https://picsum.photos/1920/1080?blur=4" 
             className="w-full h-full object-cover opacity-10 mix-blend-multiply" 
             alt="Background Texture"
          />
-         {/* Glass Overlay for content readability */}
          <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-[#f3f2ed]/80 to-[#e6e5e0]/90"></div>
       </div>
 
-      {/* Main Content Container - Relative z-10 */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col min-h-screen">
         
         {/* Navigation / Header */}
@@ -176,7 +203,6 @@ function App() {
               </p>
             </div>
             
-            {/* Filter Tabs */}
             <div className="mt-4 md:mt-0 bg-stone-200/50 p-1 rounded-lg inline-flex">
               {(['all', 'app', 'tool'] as const).map((tab) => (
                 <button
@@ -201,9 +227,12 @@ function App() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProjects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
+                <ProjectCard 
+                    key={project.id} 
+                    project={project} 
+                    onNavigate={handleNavigate}
+                />
               ))}
-              {/* Fallback if admin hides everything or filtering leaves nothing */}
               {filteredProjects.length === 0 && (
                 <div className="col-span-full py-12 text-center text-gray-400 italic">
                   暂无相关项目展示
@@ -213,61 +242,24 @@ function App() {
           )}
         </section>
 
-        {/* Admin/Technical Footer Section - Only show simplified version to public, full to admin */}
-        <section className="bg-zen-brown text-stone-100 rounded-3xl p-8 md:p-12 mb-20 relative overflow-hidden">
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-zen-accent/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-zen-green/20 rounded-full blur-3xl"></div>
-          
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between">
-            <div className="mb-8 md:mb-0 md:pr-10">
-              <h2 className="text-2xl font-serif font-bold mb-4">技术架构与部署</h2>
-              <p className="text-stone-300 leading-relaxed mb-6">
-                本站采用 React + TypeScript 构建，注重高扩展性与模块化设计。
-                未来将通过 1panel 面板与 OpenResty 进行容器化部署，确保服务的稳定性与安全性。
-                {isAdmin && <span className="text-zen-accent block mt-2 font-bold">[管理员状态: Mock API 数据层已连接，后台服务监控中]</span>}
-              </p>
-              <div className="flex flex-wrap gap-3">
-                {['React 18', 'TypeScript', 'Tailwind', 'OpenResty', 'Docker'].map((tech) => (
-                  <span key={tech} className="px-3 py-1 bg-white/10 rounded-lg text-xs font-mono border border-white/10">
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-            
-            {/* Server Status Widget - Only interactive for admin */}
-            <div className="shrink-0 w-full md:w-auto">
-               <div className={`bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/10 max-w-sm ${isAdmin ? 'border-zen-green/50 shadow-lg shadow-zen-green/20' : ''}`}>
-                 <div className="flex items-center mb-4 border-b border-white/10 pb-4">
-                   <div className="w-3 h-3 bg-red-400 rounded-full mr-2"></div>
-                   <div className="w-3 h-3 bg-yellow-400 rounded-full mr-2"></div>
-                   <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                 </div>
-                 <div className="space-y-2 font-mono text-xs text-green-300">
-                   <p><span className="text-purple-300">const</span> <span className="text-blue-300">system</span> = <span className="text-yellow-300">"Online"</span>;</p>
-                   {isAdmin ? (
-                     <>
-                        <p className="text-zen-accent">> Admin Access Granted</p>
-                        <p className="text-stone-300">> Monitoring logs...</p>
-                     </>
-                   ) : (
-                     <p><span className="text-purple-300">await</span> deploy(<span className="text-yellow-300">"1panel"</span>);</p>
-                   )}
-                 </div>
-               </div>
-            </div>
-          </div>
-        </section>
-
         {/* Footer */}
         <footer className="mt-auto py-8 border-t border-gray-200/50 text-center md:text-left flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
           <div className="mb-4 md:mb-0">
             <p className="font-serif text-gray-700 font-medium mb-1">{SITE_CONFIG.title}</p>
             <p>{SITE_CONFIG.footerText}</p>
           </div>
-          <div className="flex space-x-6">
+          <div className="flex space-x-6 items-center">
             <a href="#" className="hover:text-zen-green transition-colors">GitHub</a>
-            {/* Hidden admin trigger for testing: Triple click footer copyright area could go here, but using URL param as requested */}
+            {/* Hidden/Subtle trigger for Admin Modal */}
+            {!isAdmin && (
+              <button 
+                onClick={() => setShowLoginModal(true)} 
+                className="text-gray-300 hover:text-gray-400 text-xs transition-colors"
+                title="管理员入口"
+              >
+                Admin
+              </button>
+            )}
             {isAdmin && <span className="text-zen-accent cursor-default">Admin Mode</span>}
           </div>
         </footer>
