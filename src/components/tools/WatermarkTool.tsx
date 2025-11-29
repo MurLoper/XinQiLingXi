@@ -219,7 +219,7 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <IconArrowRight className="w-5 h-5 transform rotate-180" />
             </button>
             <h1 className="text-lg md:text-xl font-serif font-bold text-zen-brown flex items-center gap-2">
-                <IconFeather className="w-5 h-5 text-zen-green" />
+                <IconFeather className="w-5 h-5 text-zen-primary" />
                 <span className="hidden xs:inline">灵犀水印工具</span>
                 <span className="xs:hidden">水印</span>
             </h1>
@@ -233,7 +233,7 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
              <button 
                 onClick={handleDownload}
                 disabled={!file || isProcessing || (!libLoaded && file?.type === 'image/gif')}
-                className={`px-4 py-1.5 md:px-6 md:py-2 bg-zen-green text-white rounded-lg shadow-lg md:hover:bg-zen-green/90 active:bg-zen-green/80 transition-all text-xs md:text-sm font-medium ${(!file || isProcessing) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`px-4 py-1.5 md:px-6 md:py-2 bg-zen-primary text-white rounded-lg shadow-lg md:hover:bg-zen-primary/90 active:bg-zen-primary/80 transition-all text-xs md:text-sm font-medium ${(!file || isProcessing) ? 'opacity-50 cursor-not-allowed' : ''}`}
              >
                 {isProcessing ? '处理中...' : (
                     <>
@@ -246,17 +246,17 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       </div>
 
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden relative">
-        <div className="w-full md:w-80 bg-white border-t md:border-t-0 md:border-r border-stone-200 p-4 md:p-6 overflow-y-auto flex-shrink-0 z-10 shadow-sm order-2 md:order-1 h-[45vh] md:h-auto">
+        <div className="w-full md:w-80 bg-white border-t md:border-t-0 md:border-r border-stone-200 p-4 md:p-6 overflow-y-auto flex-shrink-0 z-10 shadow-sm order-2 md:order-1 h-[45vh] md:h-auto pb-32 md:pb-6">
             <div className="bg-stone-100 p-1 rounded-lg flex mb-6">
                 <button 
                     onClick={() => setConfig(c => ({...c, mode: 'tiled'}))}
-                    className={`flex-1 py-1.5 text-sm rounded-md transition-all active:scale-[0.98] ${config.mode === 'tiled' ? 'bg-white shadow-sm text-zen-green font-medium' : 'text-gray-500'}`}
+                    className={`flex-1 py-1.5 text-sm rounded-md transition-all active:scale-[0.98] ${config.mode === 'tiled' ? 'bg-white shadow-sm text-zen-primary font-medium' : 'text-gray-500'}`}
                 >
                     全图平铺
                 </button>
                 <button 
                     onClick={() => setConfig(c => ({...c, mode: 'single'}))}
-                    className={`flex-1 py-1.5 text-sm rounded-md transition-all active:scale-[0.98] ${config.mode === 'single' ? 'bg-white shadow-sm text-zen-green font-medium' : 'text-gray-500'}`}
+                    className={`flex-1 py-1.5 text-sm rounded-md transition-all active:scale-[0.98] ${config.mode === 'single' ? 'bg-white shadow-sm text-zen-primary font-medium' : 'text-gray-500'}`}
                 >
                     居中单个
                 </button>
@@ -265,13 +265,13 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             <div className="flex gap-4 mb-6 text-sm font-medium text-gray-600 border-b border-stone-100 pb-2">
                 <button 
                     onClick={() => setConfig(c => ({...c, type: 'text'}))}
-                    className={`pb-2 px-1 active:opacity-70 ${config.type === 'text' ? 'text-zen-brown border-b-2 border-zen-green' : 'text-gray-400'}`}
+                    className={`pb-2 px-1 active:opacity-70 ${config.type === 'text' ? 'text-zen-brown border-b-2 border-zen-primary' : 'text-gray-400'}`}
                 >
                     文字模式
                 </button>
                 <button 
                     onClick={() => setConfig(c => ({...c, type: 'image'}))}
-                    className={`pb-2 px-1 active:opacity-70 ${config.type === 'image' ? 'text-zen-brown border-b-2 border-zen-green' : 'text-gray-400'}`}
+                    className={`pb-2 px-1 active:opacity-70 ${config.type === 'image' ? 'text-zen-brown border-b-2 border-zen-primary' : 'text-gray-400'}`}
                 >
                     图片模式
                 </button>
@@ -286,7 +286,7 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                 type="text" 
                                 value={config.text}
                                 onChange={(e) => setConfig(c => ({...c, text: e.target.value}))}
-                                className="w-full px-3 py-2 border border-stone-200 rounded-md focus:outline-none focus:border-zen-green bg-stone-50"
+                                className="w-full px-3 py-2 border border-stone-200 rounded-md focus:outline-none focus:border-zen-primary bg-stone-50"
                             />
                         </div>
                         <div>
@@ -309,7 +309,7 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                 type="range" min="12" max="200" 
                                 value={config.textSize}
                                 onChange={(e) => setConfig(c => ({...c, textSize: Number(e.target.value)}))}
-                                className="w-full mt-2 accent-zen-green h-1 bg-stone-200 rounded-lg appearance-none cursor-pointer"
+                                className="w-full mt-2 accent-zen-primary h-1 bg-stone-200 rounded-lg appearance-none cursor-pointer"
                             />
                         </div>
                     </>
@@ -321,7 +321,7 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                              {watermarkImage ? (
                                 <img src={watermarkImage.src} alt="Watermark" className="h-20 mx-auto object-contain" />
                              ) : (
-                                <span className="text-xs text-gray-400 group-hover:text-zen-green transition-colors">点击上传透明 PNG</span>
+                                <span className="text-xs text-gray-400 group-hover:text-zen-primary transition-colors">点击上传透明 PNG</span>
                              )}
                         </div>
                         <div className="mt-4">
@@ -332,7 +332,7 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                 type="range" min="0.1" max="3" step="0.1"
                                 value={config.imageScale}
                                 onChange={(e) => setConfig(c => ({...c, imageScale: Number(e.target.value)}))}
-                                className="w-full accent-zen-green h-1 bg-stone-200 rounded-lg appearance-none cursor-pointer"
+                                className="w-full accent-zen-primary h-1 bg-stone-200 rounded-lg appearance-none cursor-pointer"
                             />
                         </div>
                     </div>
@@ -349,7 +349,7 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                             type="range" min="0" max="1" step="0.05"
                             value={config.opacity}
                             onChange={(e) => setConfig(c => ({...c, opacity: Number(e.target.value)}))}
-                            className="w-full accent-zen-green h-1 bg-stone-200 rounded-lg appearance-none cursor-pointer"
+                            className="w-full accent-zen-primary h-1 bg-stone-200 rounded-lg appearance-none cursor-pointer"
                         />
                     </div>
 
@@ -361,7 +361,7 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                             type="range" min="-180" max="180" step="5"
                             value={config.rotate}
                             onChange={(e) => setConfig(c => ({...c, rotate: Number(e.target.value)}))}
-                            className="w-full accent-zen-green h-1 bg-stone-200 rounded-lg appearance-none cursor-pointer"
+                            className="w-full accent-zen-primary h-1 bg-stone-200 rounded-lg appearance-none cursor-pointer"
                         />
                     </div>
 
@@ -374,7 +374,7 @@ const WatermarkTool: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                 type="range" min="0" max="500" step="10"
                                 value={config.gap}
                                 onChange={(e) => setConfig(c => ({...c, gap: Number(e.target.value)}))}
-                                className="w-full accent-zen-green h-1 bg-stone-200 rounded-lg appearance-none cursor-pointer"
+                                className="w-full accent-zen-primary h-1 bg-stone-200 rounded-lg appearance-none cursor-pointer"
                             />
                         </div>
                     )}

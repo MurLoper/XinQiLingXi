@@ -13,8 +13,8 @@ export const MOCK_PROJECTS: Project[] = [
     tags: ['React Native', 'Node.js', '跨平台', '情感计算'],
     coverImage: 'https://picsum.photos/800/600?grayscale', 
     links: [
-      { label: '查看详情', url: '#', type: 'demo' },
-      { label: 'H5预览', url: '#', type: 'demo' }
+      { label: '立即体验', url: '#', type: 'internal', internalRoute: 'project-mood-diary' },
+      { label: 'GitHub', url: '#', type: 'github' }
     ],
     features: [
       { name: '主题切换', description: '随心而动，不仅仅是颜色，更是心情的映射' },

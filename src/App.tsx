@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, Suspense, useMemo } from 'react';
 import { authService } from './services/authService';
 import LoginModal from './components/LoginModal';
@@ -5,8 +6,9 @@ import SeasonSwitcher, { Season } from './components/SeasonSwitcher';
 import ChatWidget from './components/ChatWidget';
 import Home from './pages/Home'; 
 
-// Lazy Load Tools
+// Lazy Load Tools & Projects
 const WatermarkTool = React.lazy(() => import('./components/tools/WatermarkTool'));
+const MoodDiary = React.lazy(() => import('./projects/mood-diary'));
 
 // 🌍 背景图片配置：地域特色极致版
 const SEASON_CONFIG: Record<Season, string> = {
@@ -65,7 +67,7 @@ const THEME_PALETTES: Record<Season, React.CSSProperties> = {
 };
 
 function App() {
-  const [currentView, setCurrentView] = useState<'home' | 'tool-watermark'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'tool-watermark' | 'project-mood-diary'>('home');
   const [isAdmin, setIsAdmin] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [currentSeason, setCurrentSeason] = useState<Season>('spring');
@@ -102,10 +104,12 @@ function App() {
   const handleNavigate = (route: string) => {
     if (route === 'tool-watermark') {
         setCurrentView('tool-watermark');
-        window.scrollTo(0, 0);
+    } else if (route === 'project-mood-diary') {
+        setCurrentView('project-mood-diary');
     } else {
         setCurrentView('home');
     }
+    window.scrollTo(0, 0);
   };
 
   const currentThemeStyles = useMemo(() => {
@@ -123,7 +127,12 @@ function App() {
         onLoginSuccess={handleLoginSuccess}
       />
       
-      <SeasonSwitcher currentSeason={currentSeason} onChange={setCurrentSeason} />
+      {/* 四季切换：在首页悬浮，在工具页折叠 */}
+      <SeasonSwitcher 
+        currentSeason={currentSeason} 
+        onChange={setCurrentSeason} 
+        variant={currentView === 'home' ? 'floating' : 'docked'}
+      />
 
       {/* 灵犀智能助手 */}
       <ChatWidget />
@@ -155,16 +164,17 @@ function App() {
       </div>
 
       <div className="relative z-10 transition-opacity duration-500 ease-in-out">
-        {currentView === 'tool-watermark' ? (
+        {currentView !== 'home' ? (
            <Suspense fallback={
               <div className="flex items-center justify-center min-h-screen relative z-10">
                   <div className="flex flex-col items-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-zen-green mb-4"></div>
-                      <p className="text-zen-brown font-serif">正在准备工具...</p>
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-zen-primary mb-4"></div>
+                      <p className="text-zen-brown font-serif">正在加载模块...</p>
                   </div>
               </div>
            }>
-              <WatermarkTool onBack={() => setCurrentView('home')} />
+              {currentView === 'tool-watermark' && <WatermarkTool onBack={() => setCurrentView('home')} />}
+              {currentView === 'project-mood-diary' && <MoodDiary onBack={() => setCurrentView('home')} />}
            </Suspense>
         ) : (
            <Home 

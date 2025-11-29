@@ -18,5 +18,9 @@ export default defineConfig({
     host: true, // Listen on all addresses
     port: 5173,
     cors: true, // Enable CORS to prevent blocking in previews
+  },
+  define: {
+    // Prevent "process is not defined" error in browser
+    'process.env': {}
   }
 })
