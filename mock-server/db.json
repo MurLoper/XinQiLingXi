@@ -1,0 +1,253 @@
+{
+  "projects": [
+    {
+      "id": "mood-diary",
+      "title": "心晴日记",
+      "subtitle": "记录生活的点滴感动",
+      "description": "一款带有主题切换，记录日记，归纳图文集，标签，签到领积分等功能的全平台日记应用。在这里，你可以放下防备，真实地面对自己的内心。",
+      "category": "App",
+      "status": "开发中",
+      "tags": ["React Native", "Node.js", "跨平台", "情感计算"],
+      "coverImage": "https://picsum.photos/800/600?grayscale",
+      "links": [
+        { "label": "立即体验", "url": "#", "type": "internal", "internalRoute": "project-mood-diary" },
+        { "label": "GitHub", "url": "#", "type": "github" }
+      ],
+      "features": [
+        { "name": "主题切换", "description": "随心而动，不仅仅是颜色，更是心情的映射" },
+        { "name": "图文归纳", "description": "智能整理你的记忆碎片，生成时光相册" },
+        { "name": "签到积分", "description": "坚持记录，获取心灵积分，兑换专属徽章" },
+        { "name": "多端同步", "description": "Web、小程序、App数据无缝流转" }
+      ]
+    },
+    {
+      "id": "frontend-tools",
+      "title": "小工具集",
+      "subtitle": "便捷高效的纯前端工具箱",
+      "description": "集成多种纯前端处理的小工具，注重隐私保护，数据不上传服务器。包括图片加水印、格式转换、JSON格式化等实用功能。",
+      "category": "工具类",
+      "status": "已上线",
+      "tags": ["React", "Canvas", "Privacy First"],
+      "coverImage": "https://picsum.photos/800/601?blur=2",
+      "links": [
+        { "label": "立即使用", "url": "#", "type": "internal", "internalRoute": "tool-watermark" }
+      ],
+      "features": [
+        { "name": "图片水印", "description": "本地处理，保护您的创作版权" },
+        { "name": "GIF支持", "description": "支持动图水印合成" }
+      ]
+    },
+    {
+      "id": "ai-agent",
+      "title": "灵犀 Agent",
+      "subtitle": "懂你的智能助手",
+      "description": "基于大模型的个人智能代理，能够访问项目数据，辅助管理后台，甚至陪你聊天解闷。它是\"心栖灵犀\"的灵魂所在。",
+      "category": "AI智能",
+      "status": "筹备中",
+      "tags": ["LLM", "LangChain", "Automation"],
+      "coverImage": "https://picsum.photos/800/602?blur=2",
+      "links": [],
+      "features": [
+        { "name": "智能访问", "description": "自然语言查询项目状态" },
+        { "name": "自动运维", "description": "辅助服务器管理与监控" }
+      ]
+    },
+    {
+      "id": "backend-admin",
+      "title": "管理中台",
+      "subtitle": "系统控制中心",
+      "description": "统一的后台服务器管理处，监控1panel + OpenResty 部署状态，管理API接口与数据权限。",
+      "category": "后台服务",
+      "status": "维护中",
+      "tags": ["NestJS", "Docker", "1panel"],
+      "coverImage": "https://picsum.photos/800/603?blur=2",
+      "links": []
+    }
+  ],
+  "diary_entries": [
+    {
+      "id": "1",
+      "date": "2024-03-20",
+      "mood": "happy",
+      "content": "今天把心晴日记集成到了主网站里，看着代码跑通的那一刻，窗外的阳光似乎都更明媚了。技术不仅仅是逻辑，也是一种表达。",
+      "images": ["https://picsum.photos/400/300?random=1"],
+      "tags": ["编程", "成就感", "阳光"],
+      "location": "云端工作室"
+    },
+    {
+      "id": "2",
+      "date": "2024-03-19",
+      "mood": "calm",
+      "content": "临溪而居，听着水声，写代码也是一种享受。不需要复杂的算法，只需要一颗平静的心。",
+      "images": [],
+      "tags": ["生活", "宁静"],
+      "location": "溪边"
+    },
+    {
+      "id": "3",
+      "date": "2024-03-15",
+      "mood": "energetic",
+      "content": "去了一趟大理，苍山洱海真的能治愈一切。拍了很多照片，每一张都是壁纸级别。",
+      "images": ["https://picsum.photos/400/400?random=2"],
+      "tags": ["旅行", "大理", "摄影"],
+      "location": "大理·洱海"
+    }
+  ],
+  "ai_providers": [
+    {
+      "id": "gemini",
+      "name": "Google Gemini",
+      "icon": "G",
+      "description": "谷歌多模态模型，速度快，支持视觉。",
+      "baseUrl": "",
+      "modelId": "gemini-2.5-flash",
+      "website": "https://aistudio.google.com/",
+      "guide": {
+        "steps": ["访问 Google AI Studio", "点击 Get API key", "创建并复制 Key"],
+        "freeInfo": "免费且速率限制宽松"
+      },
+      "supportsVision": true
+    },
+    {
+      "id": "github",
+      "name": "GitHub Models",
+      "icon": "GH",
+      "description": "对 GitHub 用户免费，无需额外密钥。",
+      "baseUrl": "https://models.inference.ai.azure.com",
+      "modelId": "gpt-4o",
+      "website": "https://github.com/marketplace/models",
+      "guide": {
+        "steps": ["登录 GitHub", "创建 Personal Access Token", "填入 Token 作为 API Key"],
+        "freeInfo": "体验期间免费，支持 GPT-4o, Llama 3 等"
+      },
+      "supportsVision": true
+    },
+    {
+      "id": "siliconflow",
+      "name": "硅基流动",
+      "icon": "SF",
+      "description": "聚合优质开源模型，研发测试首选。",
+      "baseUrl": "https://api.siliconflow.cn/v1",
+      "modelId": "deepseek-ai/DeepSeek-V2.5",
+      "website": "https://cloud.siliconflow.cn/",
+      "guide": {
+        "steps": ["注册硅基流动账户", "创建 API 密钥"],
+        "freeInfo": "Qwen 2.5, Llama 3.1 等开源模型免费"
+      },
+      "supportsVision": false
+    },
+    {
+      "id": "deepseek",
+      "name": "DeepSeek",
+      "icon": "DS",
+      "description": "深度求索，中文逻辑推理与代码能力优秀。",
+      "baseUrl": "https://api.deepseek.com",
+      "modelId": "deepseek-chat",
+      "website": "https://platform.deepseek.com/api_keys",
+      "guide": {
+        "steps": ["访问 DeepSeek 开放平台", "创建 API Key"],
+        "freeInfo": "注册赠送 10元 额度"
+      },
+      "supportsVision": false
+    },
+    {
+      "id": "kimi",
+      "name": "Kimi (Moonshot)",
+      "icon": "K",
+      "description": "月之暗面，长文本处理能力极强。",
+      "baseUrl": "https://api.moonshot.cn/v1",
+      "modelId": "moonshot-v1-8k",
+      "website": "https://platform.moonshot.cn/console/api-keys",
+      "guide": {
+        "steps": ["访问 Moonshot 开放平台", "注册实名认证", "新建 API Key"],
+        "freeInfo": "新用户赠送额度"
+      },
+      "supportsVision": false
+    },
+    {
+      "id": "zhipu",
+      "name": "智谱 AI",
+      "icon": "Z",
+      "description": "清华系 GLM 大模型，综合能力全面。",
+      "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
+      "modelId": "glm-4-flash",
+      "website": "https://open.bigmodel.cn/",
+      "guide": {
+        "steps": ["访问智谱 AI 开放平台", "查看 API Key"],
+        "freeInfo": "新用户赠送额度，GLM-4-Flash 免费"
+      },
+      "supportsVision": true
+    },
+    {
+      "id": "spark",
+      "name": "讯飞星火",
+      "icon": "S",
+      "description": "科大讯飞，提供永久免费 Lite 版。",
+      "baseUrl": "https://spark-api-open.xf-yun.com/v1",
+      "modelId": "general",
+      "website": "https://xinghuo.xfyun.cn/sparkapi",
+      "guide": {
+        "steps": ["访问讯飞开放平台", "创建应用并获取 API Password (作为Key)"],
+        "freeInfo": "Spark Lite 版本 API 永久免费"
+      },
+      "supportsVision": false
+    },
+    {
+      "id": "qwen",
+      "name": "通义千问",
+      "icon": "Q",
+      "description": "阿里云，开源界的扛把子。",
+      "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "modelId": "qwen-turbo",
+      "website": "https://dashscope.console.aliyun.com/apiKey",
+      "guide": {
+        "steps": ["开通阿里云百炼服务", "创建 API Key"],
+        "freeInfo": "每月赠送大量 Tokens，部分模型限时免费"
+      },
+      "supportsVision": true
+    },
+    {
+      "id": "hunyuan",
+      "name": "腾讯混元",
+      "icon": "H",
+      "description": "腾讯云，接入生态丰富。",
+      "baseUrl": "https://api.hunyuan.cloud.tencent.com/v1",
+      "modelId": "hunyuan-lite",
+      "website": "https://console.cloud.tencent.com/hunyuan",
+      "guide": {
+        "steps": ["腾讯云控制台开通", "创建 API Key"],
+        "freeInfo": "提供 Lite 模型免费额度"
+      },
+      "supportsVision": false
+    },
+    {
+      "id": "cerebras",
+      "name": "Cerebras",
+      "icon": "C",
+      "description": "超快推理速度，每日大额免费。",
+      "baseUrl": "https://api.cerebras.ai/v1",
+      "modelId": "llama3.1-70b",
+      "website": "https://cerebras.ai/",
+      "guide": {
+        "steps": ["注册 Cerebras 开发者", "获取 API Key"],
+        "freeInfo": "每日 100万 Token 免费"
+      },
+      "supportsVision": false
+    },
+    {
+      "id": "huggingface",
+      "name": "Hugging Face",
+      "icon": "HF",
+      "description": "AI 界的 GitHub，海量开源模型。",
+      "baseUrl": "https://api-inference.huggingface.co/models",
+      "modelId": "meta-llama/Meta-Llama-3-8B-Instruct",
+      "website": "https://huggingface.co/settings/tokens",
+      "guide": {
+        "steps": ["登录 Hugging Face", "Settings -> Access Tokens", "创建 Read 权限 Token"],
+        "freeInfo": "每日 50万 Token 免费"
+      },
+      "supportsVision": false
+    }
+  ],
+  "user_ai_configs": []
+}

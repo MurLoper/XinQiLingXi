@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
     IconArrowRight, IconFeather, IconSun, IconCheck, IconMapPin, 
     IconGrid, IconList, IconLayout, IconBook, IconFilm, IconTag, IconPlus, IconTrash,
@@ -7,6 +7,7 @@ import {
     IconMagic, IconEye, IconSparkles
 } from '../../components/Icons';
 import { aiService } from '../../services/aiService';
+import { apiService } from '../../services/mockApi'; // 使用重构后的 API 服务
 
 // --- Types ---
 interface DiaryEntry {
@@ -30,37 +31,6 @@ const MOOD_CONFIG = {
     energetic: { icon: IconMoodEnergetic, label: '活力' },
 };
 
-// --- Mock Data ---
-const MOCK_ENTRIES: DiaryEntry[] = [
-  { 
-    id: '1', 
-    date: '2024-03-20', 
-    mood: 'happy', 
-    content: '今天把心晴日记集成到了主网站里，看着代码跑通的那一刻，窗外的阳光似乎都更明媚了。技术不仅仅是逻辑，也是一种表达。', 
-    images: ['https://picsum.photos/400/300?random=1'],
-    tags: ['编程', '成就感', '阳光'],
-    location: '云端工作室'
-  },
-  { 
-    id: '2', 
-    date: '2024-03-19', 
-    mood: 'calm', 
-    content: '临溪而居，听着水声，写代码也是一种享受。不需要复杂的算法，只需要一颗平静的心。', 
-    images: [],
-    tags: ['生活', '宁静'],
-    location: '溪边'
-  },
-  { 
-    id: '3', 
-    date: '2024-03-15', 
-    mood: 'energetic', 
-    content: '去了一趟大理，苍山洱海真的能治愈一切。拍了很多照片，每一张都是壁纸级别。', 
-    images: ['https://picsum.photos/400/400?random=2'],
-    tags: ['旅行', '大理', '摄影'],
-    location: '大理·洱海'
-  }
-];
-
 // --- Templates ---
 const AlbumTemplates: Record<TemplateType, { name: string; desc: string; icon: React.ReactNode; render: (entries: DiaryEntry[]) => React.ReactNode }> = {
     timeline: {
@@ -70,7 +40,7 @@ const AlbumTemplates: Record<TemplateType, { name: string; desc: string; icon: R
         render: (entries) => (
             <div className="space-y-8 pl-4 border-l-2 border-zen-primary/30 py-4">
                 {entries.map((entry, idx) => (
-                    <div key={idx} className="relative pl-6">
+                    <div key={idx} className="relative pl-6 break-inside-avoid">
                         <div className="absolute -left-[21px] top-0 w-4 h-4 rounded-full bg-zen-primary border-4 border-white shadow-sm"></div>
                         <div className="text-xs text-zen-primary font-bold mb-1 font-serif">{entry.date}</div>
                         <div className="bg-white p-4 rounded-lg shadow-sm border border-stone-100 mb-2">
@@ -91,7 +61,7 @@ const AlbumTemplates: Record<TemplateType, { name: string; desc: string; icon: R
         render: (entries) => (
             <div className="grid grid-cols-2 gap-4 p-4">
                 {entries.map((entry, idx) => (
-                    <div key={idx} className="bg-white p-2 pb-8 shadow-md transform rotate-1 hover:rotate-0 transition-transform duration-300" style={{ transform: `rotate(${idx % 2 === 0 ? '-2deg' : '2deg'})` }}>
+                    <div key={idx} className="bg-white p-2 pb-8 shadow-md break-inside-avoid transform rotate-0" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}>
                          <div className="aspect-square bg-gray-100 mb-2 overflow-hidden">
                              {entry.images && entry.images.length > 0 ? (
                                 <img src={entry.images[0]} className="w-full h-full object-cover filter contrast-110" alt="polaroid" />
@@ -113,7 +83,7 @@ const AlbumTemplates: Record<TemplateType, { name: string; desc: string; icon: R
         render: (entries) => (
             <div className="space-y-12 p-6 bg-white">
                 {entries.map((entry, idx) => (
-                    <div key={idx} className="flex flex-col gap-4">
+                    <div key={idx} className="flex flex-col gap-4 break-inside-avoid">
                         {entry.images && entry.images.length > 0 && (
                             <div className="w-full overflow-hidden shadow-lg">
                                 <img src={entry.images[0]} className="w-full object-cover grayscale-[20%]" alt="magazine" />
@@ -136,7 +106,7 @@ const AlbumTemplates: Record<TemplateType, { name: string; desc: string; icon: R
         render: (entries) => (
             <div className="grid grid-cols-3 gap-1">
                 {entries.map((entry, idx) => (
-                    <div key={idx} className="aspect-square relative group overflow-hidden bg-gray-100">
+                    <div key={idx} className="aspect-square relative group overflow-hidden bg-gray-100 break-inside-avoid">
                         {entry.images && entry.images.length > 0 ? (
                             <img src={entry.images[0]} className="w-full h-full object-cover" alt="grid" />
                         ) : (
@@ -144,7 +114,7 @@ const AlbumTemplates: Record<TemplateType, { name: string; desc: string; icon: R
                                 {entry.content.slice(0, 10)}...
                             </div>
                         )}
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2">
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2 print:hidden">
                              <p className="text-white text-[10px] text-center line-clamp-3">{entry.content}</p>
                         </div>
                     </div>
@@ -159,7 +129,7 @@ const AlbumTemplates: Record<TemplateType, { name: string; desc: string; icon: R
         render: (entries) => (
             <div className="divide-y divide-gray-100">
                 {entries.map((entry, idx) => (
-                    <div key={idx} className="py-4 px-4 flex gap-4">
+                    <div key={idx} className="py-4 px-4 flex gap-4 break-inside-avoid">
                         <div className="w-16 h-16 flex-shrink-0 bg-stone-100 rounded-md overflow-hidden">
                             {entry.images && entry.images.length > 0 ? (
                                 <img src={entry.images[0]} className="w-full h-full object-cover" alt="thumb" />
@@ -183,7 +153,7 @@ const AlbumTemplates: Record<TemplateType, { name: string; desc: string; icon: R
         render: (entries) => (
             <div className="space-y-1">
                 {entries.map((entry, idx) => (
-                    <div key={idx} className="relative h-64 w-full overflow-hidden group">
+                    <div key={idx} className="relative h-64 w-full overflow-hidden group break-inside-avoid">
                         {entry.images && entry.images.length > 0 ? (
                             <img src={entry.images[0]} className="w-full h-full object-cover" alt="hero" />
                         ) : (
@@ -205,9 +175,9 @@ const AlbumTemplates: Record<TemplateType, { name: string; desc: string; icon: R
         desc: '泛黄纸张，时光痕迹',
         icon: <IconBook className="w-5 h-5" />,
         render: (entries) => (
-            <div className="p-6 bg-[#f0e6d2] space-y-6" style={{ backgroundImage: 'repeating-linear-gradient(#f0e6d2 0px, #f0e6d2 24px, #e6dac3 25px)' }}>
+            <div className="p-6 bg-[#f0e6d2] space-y-6 print:bg-[#f0e6d2]" style={{ backgroundImage: 'repeating-linear-gradient(#f0e6d2 0px, #f0e6d2 24px, #e6dac3 25px)' }}>
                 {entries.map((entry, idx) => (
-                    <div key={idx} className="relative pl-4 pt-1">
+                    <div key={idx} className="relative pl-4 pt-1 break-inside-avoid">
                         <div className="font-serif text-[#5c4b37] text-sm leading-[25px]">
                             <span className="font-bold mr-2 text-[#8b4513]">{entry.date}</span>
                             {entry.content}
@@ -536,37 +506,115 @@ const AlbumView: React.FC<{
     const componentRef = useRef<HTMLDivElement>(null);
 
     const handlePrint = () => {
-        // Simple print simulation
         const printContent = componentRef.current;
         if (!printContent) return;
-        
-        const win = window.open('', '', 'width=800,height=900');
-        if (win) {
-            win.document.write(`
-                <html>
-                    <head>
-                        <title>心晴日记 - ${AlbumTemplates[template].name}</title>
-                        <script src="https://cdn.tailwindcss.com"></script>
-                        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
-                        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
-                        <style>
-                            body { font-family: 'Noto Serif SC', serif; background: #fff; }
-                            @media print {
-                                body { -webkit-print-color-adjust: exact; }
-                            }
-                        </style>
-                    </head>
-                    <body class="p-8">
-                        ${printContent.innerHTML}
-                    </body>
-                </html>
-            `);
-            win.document.close();
-            win.setTimeout(() => {
-                win.print();
-                win.close();
-            }, 1000);
+
+        // Get the HTML content
+        const contentHtml = printContent.innerHTML;
+
+        // Open a new window
+        const win = window.open('', '_blank', 'width=900,height=1200,menubar=0,toolbar=0,location=0,status=0');
+        if (!win) {
+            alert("请允许弹出窗口以导出 PDF");
+            return;
         }
+
+        win.document.open();
+        win.document.write(`
+            <!DOCTYPE html>
+            <html lang="zh-CN">
+                <head>
+                    <title>心晴日记 - ${AlbumTemplates[template].name}</title>
+                    <meta charset="utf-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                    <!-- Load Tailwind CSS -->
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <!-- Load Fonts -->
+                    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+                    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+                    <style>
+                        /* Base Print Styles */
+                        body {
+                            font-family: 'Noto Serif SC', serif;
+                            background-color: #fff !important;
+                            color: #000 !important;
+                            margin: 0;
+                            padding: 0;
+                        }
+                        
+                        /* Container override for print */
+                        #print-container {
+                            padding: 40px;
+                            width: 100%;
+                            max-width: 100%;
+                        }
+
+                        /* Ensure graphics (bg colors, images) are printed */
+                        * {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
+
+                        /* Fix for images splitting across pages */
+                        img {
+                            max-width: 100%;
+                            page-break-inside: avoid;
+                        }
+                        
+                        /* Fix for items splitting */
+                        .break-inside-avoid {
+                            page-break-inside: avoid;
+                        }
+
+                        @page {
+                            margin: 10mm;
+                            size: auto; 
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div id="print-container">
+                        ${contentHtml}
+                    </div>
+                    <script>
+                        // Wait for Tailwind and Images
+                        window.onload = function() {
+                            // Check if images are loaded
+                            const images = document.images;
+                            let loaded = 0;
+                            
+                            const tryPrint = () => {
+                                // Give Tailwind a moment to parse classes
+                                setTimeout(() => {
+                                    window.print();
+                                }, 800);
+                            };
+
+                            if (images.length === 0) {
+                                tryPrint();
+                            } else {
+                                for (let i = 0; i < images.length; i++) {
+                                    if (images[i].complete) {
+                                        loaded++;
+                                    } else {
+                                        images[i].onload = () => {
+                                            loaded++;
+                                            if (loaded === images.length) tryPrint();
+                                        };
+                                        images[i].onerror = () => {
+                                            loaded++; // Print anyway if error
+                                            if (loaded === images.length) tryPrint();
+                                        }
+                                    }
+                                }
+                                if (loaded === images.length) tryPrint();
+                            }
+                        };
+                    </script>
+                </body>
+            </html>
+        `);
+        win.document.close();
     };
 
     return (
@@ -608,12 +656,30 @@ const AlbumView: React.FC<{
 // --- Main App Component ---
 const DiaryApp: React.FC = () => {
   const [view, setView] = useState<ViewMode>('list');
-  const [entries, setEntries] = useState<DiaryEntry[]>(MOCK_ENTRIES);
+  const [entries, setEntries] = useState<DiaryEntry[]>([]);
   const [albumData, setAlbumData] = useState<{entries: DiaryEntry[], template: TemplateType} | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleSaveEntry = (newEntry: DiaryEntry) => {
+  // Fetch entries from API on mount
+  useEffect(() => {
+    const fetchEntries = async () => {
+      setLoading(true);
+      const res = await apiService.getDiaryEntries();
+      if (res.success) {
+        setEntries(res.data);
+      }
+      setLoading(false);
+    };
+    fetchEntries();
+  }, []);
+
+  const handleSaveEntry = async (newEntry: DiaryEntry) => {
+    // 乐观更新 UI
     setEntries([newEntry, ...entries]);
     setView('list');
+    
+    // 异步保存到后端
+    await apiService.saveDiaryEntry(newEntry);
   };
 
   const handleGenerateAlbum = (filtered: DiaryEntry[], template: TemplateType) => {
@@ -657,8 +723,12 @@ const DiaryApp: React.FC = () => {
                     <span className="text-xs text-gray-300">{entries.length} 篇</span>
                 </div>
                 
-                {entries.map(entry => {
-                    const MoodIcon = MOOD_CONFIG[entry.mood].icon;
+                {loading ? (
+                    <div className="flex justify-center py-8">
+                         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-zen-primary"></div>
+                    </div>
+                ) : entries.map(entry => {
+                    const MoodIcon = MOOD_CONFIG[entry.mood]?.icon || IconMoodCalm;
                     return (
                         <div key={entry.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 transition-all active:scale-[0.99] group hover:border-zen-primary/30">
                             <div className="flex justify-between items-center mb-2">

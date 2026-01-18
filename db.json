@@ -1,0 +1,4 @@
+{
+  "message": "数据源已迁移至 mock-server/db.json，请使用 npm run server:mock 命令或进入 mock-server 目录启动服务。",
+  "moved_to": "./mock-server/db.json"
+}

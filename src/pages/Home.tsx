@@ -1,24 +1,25 @@
 
 import React, { useState, useEffect } from 'react';
-import { Project, ApiResponse, ProjectCategory } from '../types';
+import { Project, ApiResponse, ProjectCategory, User } from '../types';
 import { apiService } from '../services/mockApi';
+import { authService } from '../services/authService';
 import ProjectCard from '../components/ProjectCard';
 import { SITE_CONFIG } from '../config/constants';
-import { IconFeather, IconHeart, IconCpu, IconSun, IconMapPin } from '../components/Icons';
+import { IconFeather, IconSun, IconMapPin } from '../components/Icons';
 import { Season } from '../components/SeasonSwitcher';
 
 interface HomePageProps {
-  isAdmin: boolean;
+  user: User | null;
   currentSeason?: Season; 
   onNavigate: (route: string) => void;
   onLoginClick: () => void;
   onLogoutClick: () => void;
 }
 
-const Home: React.FC<HomePageProps> = ({ isAdmin, currentSeason = 'spring', onNavigate, onLoginClick, onLogoutClick }) => {
+const Home: React.FC<HomePageProps> = ({ user, currentSeason = 'spring', onNavigate, onLoginClick, onLogoutClick }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'all' | 'app' | 'tool'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'app' | 'tool' | 'analysis'>('all');
 
   const seasonInfo = {
     spring: { loc: '彩云之南', vibe: '和煦温柔', desc: '如风过耳海，如花开四季' },
@@ -46,13 +47,32 @@ const Home: React.FC<HomePageProps> = ({ isAdmin, currentSeason = 'spring', onNa
     fetchProjects();
   }, []);
 
+  // --- 权限过滤逻辑 ---
   const filteredProjects = projects.filter(p => {
-    if (!isAdmin && p.category === ProjectCategory.Backend) return false;
+    // 1. 角色权限检查 (Project.minRole)
+    if (p.minRole && !authService.hasPermission(user, p.minRole)) {
+        return false;
+    }
+    
+    // 2. Tab 过滤
     if (activeTab === 'all') return true;
     if (activeTab === 'app') return p.category === ProjectCategory.App || p.category === ProjectCategory.Web;
     if (activeTab === 'tool') return p.category === ProjectCategory.Tool || p.category === ProjectCategory.AI || p.category === ProjectCategory.Backend;
+    if (activeTab === 'analysis') return p.category === ProjectCategory.Analysis;
+    
     return true;
   });
+
+  const handleCardNavigate = (route: string) => {
+      // 检查是否需要登录才能访问
+      // 虽然 filteredProjects 已经过滤了不可见的项目，但为了双重保险或处理 "requiresLogin" 标记
+      const project = projects.find(p => p.links.some(l => l.internalRoute === route));
+      if (project?.requiresLogin && !user) {
+          onLoginClick(); // 触发登录
+          return;
+      }
+      onNavigate(route);
+  };
 
   return (
     <div className="relative z-10 flex flex-col min-h-screen font-sans text-zen-brown w-full">
@@ -62,27 +82,40 @@ const Home: React.FC<HomePageProps> = ({ isAdmin, currentSeason = 'spring', onNa
         
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 md:py-8 flex justify-between items-center">
             <div className="flex items-center gap-3 group cursor-default">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-zen-primary to-zen-secondary rounded-2xl flex items-center justify-center text-white shadow-soft group-hover:scale-105 transition-transform duration-500 group-hover:shadow-zen-primary/30">
-                <IconFeather className="w-5 h-5 md:w-6 md:h-6" />
-            </div>
-            <div className="flex flex-col">
-                <h1 className="text-xl md:text-2xl font-serif font-bold tracking-wide text-zen-brown flex items-center gap-2">
-                {SITE_CONFIG.title}
-                {isAdmin && <span className="text-[10px] px-2 py-0.5 bg-zen-accent text-white rounded-full font-sans tracking-normal uppercase">Admin</span>}
-                </h1>
-                <p className="text-[10px] md:text-xs text-zen-primary/90 uppercase tracking-[0.2em] font-medium">Heart Dwelling</p>
-            </div>
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-zen-primary to-zen-secondary rounded-2xl flex items-center justify-center text-white shadow-soft group-hover:scale-105 transition-transform duration-500 group-hover:shadow-zen-primary/30">
+                    <IconFeather className="w-5 h-5 md:w-6 md:h-6" />
+                </div>
+                <div className="flex flex-col">
+                    <h1 className="text-xl md:text-2xl font-serif font-bold tracking-wide text-zen-brown flex items-center gap-2">
+                    {SITE_CONFIG.title}
+                    {user && (
+                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-sans tracking-normal uppercase text-white ${user.role === 'admin' ? 'bg-red-500' : 'bg-zen-primary'}`}>
+                             {user.role}
+                         </span>
+                    )}
+                    </h1>
+                    <p className="text-[10px] md:text-xs text-zen-primary/90 uppercase tracking-[0.2em] font-medium">Heart Dwelling</p>
+                </div>
             </div>
             <nav className="flex items-center space-x-4 md:space-x-10 text-sm font-medium text-zen-brown">
-            <div className="hidden md:flex space-x-10">
-                <a href="#projects" className="md:hover:text-zen-primary transition-colors relative after:content-[''] after:absolute after:w-0 after:h-0.5 after:bg-zen-primary after:left-0 after:-bottom-1 after:transition-all md:hover:after:w-full active:text-zen-primary">项目展示</a>
-                <a href="#about" className="md:hover:text-zen-primary transition-colors relative after:content-[''] after:absolute after:w-0 after:h-0.5 after:bg-zen-primary after:left-0 after:-bottom-1 after:transition-all md:hover:after:w-full active:text-zen-primary">关于灵犀</a>
-            </div>
-            {isAdmin ? (
-                <button onClick={onLogoutClick} className="text-red-400 md:hover:text-red-600 active:text-red-600 transition-colors px-2">退出</button>
-            ) : (
-                <button onClick={onLoginClick} className="md:hover:text-zen-primary active:text-zen-primary transition-colors px-2">登录</button>
-            )}
+                <div className="hidden md:flex space-x-10">
+                    <a href="#projects" className="md:hover:text-zen-primary transition-colors">探索项目</a>
+                    <a href="#about" className="md:hover:text-zen-primary transition-colors">关于灵犀</a>
+                </div>
+                
+                {user ? (
+                    <div className="flex items-center gap-3">
+                         <div className="text-right hidden sm:block">
+                             <div className="text-xs font-bold">{user.nickname}</div>
+                             <div className="text-[10px] text-gray-500">积分: {user.points}</div>
+                         </div>
+                         <button onClick={onLogoutClick} className="text-red-400 md:hover:text-red-600 active:text-red-600 transition-colors text-xs border border-red-200 px-2 py-1 rounded">退出</button>
+                    </div>
+                ) : (
+                    <button onClick={onLoginClick} className="bg-zen-primary text-white px-4 py-1.5 rounded-full shadow-sm hover:bg-zen-primary/90 transition-all active:scale-95">
+                        登录 / 注册
+                    </button>
+                )}
             </nav>
         </div>
       </header>
@@ -111,48 +144,28 @@ const Home: React.FC<HomePageProps> = ({ isAdmin, currentSeason = 'spring', onNa
             </h2>
             
             <p className="max-w-2xl text-lg md:text-xl text-zen-brown/80 leading-relaxed mb-12 font-normal animate-fade-in-up delay-200">
-            这里是我的数字花园，<span className="text-zen-accent font-medium">{currentInfo.desc}</span>。<br className="hidden md:block"/>
-            用代码构建工具，用智慧连接灵犀，<br className="hidden md:block"/>
-            只为在纷扰的世界中，服务自己，也温暖偶然路过的你。
+            这里是{SITE_CONFIG.author}的数字花园。<br className="hidden md:block"/>
+            用代码构建工具，用数据辅助决策。<br className="hidden md:block"/>
+            {user ? `欢迎回来，${user.nickname}。` : '登录后解锁更多专属工具与服务。'}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-5 animate-fade-in-up delay-300 relative z-20">
             <a 
                 href="#projects" 
                 className="px-10 py-4 bg-zen-primary text-white rounded-full font-bold tracking-wide shadow-lg md:hover:bg-zen-primary/90 md:hover:-translate-y-1 active:scale-95 active:bg-zen-primary/80 transition-all duration-300 flex items-center justify-center"
-                style={{ boxShadow: '0 10px 25px -5px rgba(var(--zen-shadow-rgb), 0.4)' }}
             >
                 探索项目
             </a>
-            <button 
-                className="px-10 py-4 text-zen-brown border border-zen-stone backdrop-blur-sm rounded-full font-medium shadow-sm md:hover:border-zen-primary/30 active:bg-zen-primary/5 active:scale-95 transition-all duration-300"
-                style={{ backgroundColor: 'var(--zen-bg)' }}
-            >
-                了解灵犀
-            </button>
+            {!user && (
+                <button 
+                    onClick={onLoginClick}
+                    className="px-10 py-4 text-zen-brown border border-zen-stone backdrop-blur-sm rounded-full font-medium shadow-sm md:hover:border-zen-primary/30 active:bg-zen-primary/5 active:scale-95 transition-all duration-300"
+                    style={{ backgroundColor: 'var(--zen-bg)' }}
+                >
+                    立即登录
+                </button>
+            )}
             </div>
-          </section>
-
-          <section id="about" className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-32 px-1">
-            {[
-            { icon: IconHeart, title: '心晴日记', desc: '情感计算，温暖陪伴', delay: '0' },
-            { icon: IconCpu, title: 'AI Agent', desc: '智能灵犀，懂你所想', delay: '100' },
-            { icon: IconFeather, title: '纯粹工具', desc: '简而不减，隐私安全', delay: '200' }
-            ].map((item, idx) => (
-            <div 
-                key={idx} 
-                className="group relative backdrop-blur-md p-8 rounded-[2rem] border border-white/50 text-center md:hover:border-zen-primary/30 transition-all duration-500 md:hover:shadow-glass md:hover:-translate-y-2 active:scale-[0.98] animate-fade-in-up"
-                style={{ animationDelay: `${item.delay}ms`, backgroundColor: 'var(--zen-bg)' }}
-            >
-                <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-transparent rounded-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                
-                <div className="w-16 h-16 mx-auto bg-white/60 rounded-2xl flex items-center justify-center mb-6 text-zen-primary md:group-hover:scale-110 md:group-hover:bg-zen-primary md:group-hover:text-white transition-all duration-500 shadow-sm ring-1 ring-white/50">
-                    <item.icon className="w-8 h-8" />
-                </div>
-                <h3 className="text-xl font-serif font-bold text-zen-brown mb-3 group-hover:text-zen-primary transition-colors">{item.title}</h3>
-                <p className="text-sm text-zen-brown/70 leading-relaxed group-hover:text-zen-brown/90">{item.desc}</p>
-            </div>
-            ))}
           </section>
 
           <section id="projects" className="mb-32 scroll-mt-24">
@@ -163,22 +176,22 @@ const Home: React.FC<HomePageProps> = ({ isAdmin, currentSeason = 'spring', onNa
                 精选项目
                 </h2>
                 <p className="text-zen-brown/60 pl-5">
-                {isAdmin ? '全域数字生态管理' : '探索我构建的数字生态，感受技术的温度'}
+                {user ? `已为您解锁 ${user.role} 权限可见的 ${filteredProjects.length} 个项目` : '登录后查看更多专属应用'}
                 </p>
             </div>
             
-            <div className="p-1.5 rounded-xl backdrop-blur-sm shadow-inner inline-flex" style={{ backgroundColor: 'var(--zen-bg)' }}>
-                {(['all', 'app', 'tool'] as const).map((tab) => (
+            <div className="p-1.5 rounded-xl backdrop-blur-sm shadow-inner inline-flex flex-wrap gap-1" style={{ backgroundColor: 'var(--zen-bg)' }}>
+                {(['all', 'app', 'tool', 'analysis'] as const).map((tab) => (
                 <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 active:scale-95 ${
+                    className={`px-4 md:px-6 py-2 rounded-lg text-sm font-medium transition-all duration-300 active:scale-95 ${
                     activeTab === tab 
                         ? 'bg-white text-zen-primary shadow-soft ring-1 ring-black/5' 
                         : 'text-zen-brown/50 md:hover:text-zen-brown/80 md:hover:bg-white/40 active:bg-white/60'
                     }`}
                 >
-                    {tab === 'all' ? '全部' : tab === 'app' ? '应用' : '工具'}
+                    {tab === 'all' ? '全部' : tab === 'app' ? '应用' : tab === 'tool' ? '工具' : '决策'}
                 </button>
                 ))}
             </div>
@@ -194,12 +207,12 @@ const Home: React.FC<HomePageProps> = ({ isAdmin, currentSeason = 'spring', onNa
                 <ProjectCard 
                     key={project.id} 
                     project={project} 
-                    onNavigate={onNavigate}
+                    onNavigate={handleCardNavigate}
                 />
                 ))}
                 {filteredProjects.length === 0 && (
                 <div className="col-span-full py-20 text-center text-zen-brown/40 italic font-serif rounded-3xl border border-dashed border-zen-brown/10" style={{ backgroundColor: 'var(--zen-bg)' }}>
-                    暂无相关项目展示
+                    {user ? '暂无相关项目展示' : '更多高级项目需要登录后查看'}
                 </div>
                 )}
             </div>
@@ -216,18 +229,6 @@ const Home: React.FC<HomePageProps> = ({ isAdmin, currentSeason = 'spring', onNa
             </div>
             <div className="text-xs text-zen-brown/50 space-y-2">
             <p>{SITE_CONFIG.footerText}</p>
-            <div className="flex justify-center gap-4 mt-4">
-                <a href="#" className="md:hover:text-zen-primary active:text-zen-primary transition-colors">GitHub</a>
-                <a href="#" className="md:hover:text-zen-primary active:text-zen-primary transition-colors">Blog</a>
-                {!isAdmin && (
-                    <button 
-                    onClick={onLoginClick} 
-                    className="md:hover:text-zen-primary active:text-zen-primary transition-colors"
-                    >
-                    Manage
-                    </button>
-                )}
-            </div>
             </div>
         </div>
       </footer>

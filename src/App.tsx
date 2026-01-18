@@ -5,24 +5,29 @@ import LoginModal from './components/LoginModal';
 import SeasonSwitcher, { Season } from './components/SeasonSwitcher';
 import ChatWidget from './components/ChatWidget';
 import Home from './pages/Home'; 
+import { User } from './types';
 
 // Lazy Load Tools & Projects
 const WatermarkTool = React.lazy(() => import('./components/tools/WatermarkTool'));
 const MoodDiary = React.lazy(() => import('./projects/mood-diary'));
+const CityFinder = React.lazy(() => import('./projects/city-finder'));
 
 // 🌍 背景图片配置：地域特色极致版
+// 注意：图片放置在 public/assets/imgs/ 目录下
 const SEASON_CONFIG: Record<Season, string> = {
   // 春（云南）：大理洱海，远山如黛，水面平静，樱花点缀
-  spring: "https://images.unsplash.com/photo-1512608121467-7293169d3f19?q=80&w=2560&auto=format&fit=crop", 
+  spring: "/assets/imgs/spring.jpg", 
   
   // 夏（海南）：三亚海棠湾，透亮的蓝天，碧绿的椰林，强烈的阳光
-  summer: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2560&auto=format&fit=crop", 
+  // (建议也下载到本地: public/assets/imgs/summer.jpg)
+  summer: "/assets/imgs/summer.jpg", 
   
   // 秋（婺源）：篁岭晒秋，古徽州建筑，屋顶的红辣椒与皇菊，暖色调
-  autumn: "https://images.unsplash.com/photo-1604509747970-17918a245593?q=80&w=2560&auto=format&fit=crop", 
+  autumn: "/assets/imgs/autumn.jpg", 
   
   // 冬（哈尔滨）：索菲亚大教堂或冰雪大世界，冷冽的冰蓝，梦幻的灯光
-  winter: "https://images.unsplash.com/photo-1548266652-99cf27701ced?q=80&w=2560&auto=format&fit=crop", 
+  // (建议也下载到本地: public/assets/imgs/winter.jpg)
+  winter: "/assets/imgs/winter.jpg", 
   
 };
 
@@ -66,20 +71,18 @@ const THEME_PALETTES: Record<Season, React.CSSProperties> = {
   } as React.CSSProperties,
 };
 
+type ViewState = 'home' | 'tool-watermark' | 'project-mood-diary' | 'project-city-finder';
+
 function App() {
-  const [currentView, setCurrentView] = useState<'home' | 'tool-watermark' | 'project-mood-diary'>('home');
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [currentView, setCurrentView] = useState<ViewState>('home');
+  const [user, setUser] = useState<User | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [currentSeason, setCurrentSeason] = useState<Season>('spring');
 
   useEffect(() => {
-    const hasSession = authService.checkSession();
-    setIsAdmin(hasSession);
-
-    const params = new URLSearchParams(window.location.search);
-    if (!hasSession && (params.get('admin') === 'true' || params.get('mode') === 'admin')) {
-      setShowLoginModal(true);
-    }
+    // Check session
+    const currentUser = authService.getCurrentUser();
+    setUser(currentUser);
 
     const month = new Date().getMonth() + 1; 
     if (month >= 3 && month <= 5) setCurrentSeason('spring');
@@ -88,27 +91,24 @@ function App() {
     else setCurrentSeason('winter');
   }, []);
 
-  const handleLoginSuccess = () => {
-    setIsAdmin(true);
-    const url = new URL(window.location.href);
-    url.searchParams.delete('admin');
-    url.searchParams.delete('mode');
-    window.history.replaceState({}, '', url);
+  const handleLoginSuccess = (u: User) => {
+    setUser(u);
+    setShowLoginModal(false);
   };
 
   const handleLogout = () => {
     authService.logout();
-    setIsAdmin(false);
+    setUser(null);
+    setCurrentView('home'); // Reset view on logout
   };
 
   const handleNavigate = (route: string) => {
-    if (route === 'tool-watermark') {
-        setCurrentView('tool-watermark');
-    } else if (route === 'project-mood-diary') {
-        setCurrentView('project-mood-diary');
-    } else {
-        setCurrentView('home');
-    }
+    // 简单的路由映射
+    if (route === 'tool-watermark') setCurrentView('tool-watermark');
+    else if (route === 'project-mood-diary') setCurrentView('project-mood-diary');
+    else if (route === 'project-city-finder') setCurrentView('project-city-finder');
+    else setCurrentView('home');
+    
     window.scrollTo(0, 0);
   };
 
@@ -127,17 +127,14 @@ function App() {
         onLoginSuccess={handleLoginSuccess}
       />
       
-      {/* 四季切换：在首页悬浮，在工具页折叠 */}
       <SeasonSwitcher 
         currentSeason={currentSeason} 
         onChange={setCurrentSeason} 
         variant={currentView === 'home' ? 'floating' : 'docked'}
       />
 
-      {/* 灵犀智能助手 */}
       <ChatWidget />
 
-      {/* 沉浸式动态背景系统 */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-zen-base transition-colors duration-1000">
          <div className="absolute inset-0 w-full h-full">
              <img 
@@ -145,6 +142,7 @@ function App() {
                src={SEASON_CONFIG[currentSeason]} 
                className="w-full h-full object-cover opacity-[0.25] mix-blend-multiply scale-105 animate-fade-in transition-all duration-1000" 
                alt={`Background - ${currentSeason}`}
+               onError={(e) => { e.currentTarget.style.display = 'none'; }}
              />
          </div>
          
@@ -157,9 +155,7 @@ function App() {
                 ? 'from-orange-100/60 via-white/50 to-yellow-100/40' 
                 : 'from-emerald-100/50 via-white/50 to-pink-100/30'   
          }`}></div>
-         
          <div className="absolute inset-0 bg-gradient-to-t from-zen-base via-zen-base/80 to-transparent transition-colors duration-1000"></div>
-
          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
       </div>
 
@@ -175,10 +171,11 @@ function App() {
            }>
               {currentView === 'tool-watermark' && <WatermarkTool onBack={() => setCurrentView('home')} />}
               {currentView === 'project-mood-diary' && <MoodDiary onBack={() => setCurrentView('home')} />}
+              {currentView === 'project-city-finder' && <CityFinder onBack={() => setCurrentView('home')} />}
            </Suspense>
         ) : (
            <Home 
-              isAdmin={isAdmin}
+              user={user}
               currentSeason={currentSeason} 
               onNavigate={handleNavigate}
               onLoginClick={() => setShowLoginModal(true)}
